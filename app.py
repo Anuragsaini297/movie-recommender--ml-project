@@ -49,8 +49,8 @@ movies_dict = pickle.load(open('movie_dict.pkl', 'rb'))
 movies = pd.DataFrame(movies_dict)
 
 # ----------------------------
-# Load similarity.pkl from Google Drive
-FILE_ID = "1i3jvxNYMB3YBGtWOcbveqSEVyBUZsOvm"  # tumhara Google Drive file ID
+# Load similarity.pkl from Google Drive (raw download link)
+FILE_ID = "1i3jvxNYMB3YBGtWOcbveqSEVyBUZsOvm"  # Google Drive file ID
 URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
 
 def load_similarity():
