@@ -2,25 +2,30 @@ import streamlit as st
 import pickle
 import pandas as pd
 import requests
+import io
 
-# Your TMDb API key
+# ----------------------------
+# TMDb API key
 API_KEY = "34d236ffd6e1e129ded294bc6345e95d"
 
-#  Real-time poster fetch from TMDb
+# ----------------------------
+# Real-time poster fetch from TMDb
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US"
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        poster_path = data.get("poster_path")
+        poster_path = data.get("poster_path") or data.get("backdrop_path")
         if poster_path:
             return "https://image.tmdb.org/t/p/w500/" + poster_path
     except:
         pass
+    # Fallback image
     return "https://via.placeholder.com/500x750.png?text=No+Poster"
 
-#    Recommend similar movies
+# ----------------------------
+# Recommend similar movies
 def recommend(movie):
     if movie not in movies['title'].values:
         return [], []
@@ -38,13 +43,26 @@ def recommend(movie):
 
     return recommended_movies, recommended_movies_posters
 
-# 📦 Load data
+# ----------------------------
+# Load movies dictionary
 movies_dict = pickle.load(open('movie_dict.pkl', 'rb'))
 movies = pd.DataFrame(movies_dict)
 
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+# ----------------------------
+# Load similarity.pkl from Google Drive
+FILE_ID = "1i3jvxNYMB3YBGtWOcbveqSEVyBUZsOvm"  # tumhara Google Drive file ID
+URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
 
-# 🎬 Streamlit UI
+def load_similarity():
+    response = requests.get(URL)
+    response.raise_for_status()
+    file_bytes = io.BytesIO(response.content)
+    return pickle.load(file_bytes)
+
+similarity = load_similarity()
+
+# ----------------------------
+# Streamlit UI
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 st.title('🎥 Movie Recommender System')
 
